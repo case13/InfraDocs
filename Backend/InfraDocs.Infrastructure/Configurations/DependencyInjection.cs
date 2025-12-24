@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using InfraDocs.Domain.Repositories.Interfaces;
 using InfraDocs.Infrastructure.Data;
+using InfraDocs.Infrastructure.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,13 @@ namespace InfraDocs.Infrastructure.Configurations
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            // Repositórios
+            services.AddScoped<IOrganizacaoRepository, OrganizacaoRepository>();
+            services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            services.AddScoped<IPessoaRepository, PessoaRepository>();
+            services.AddScoped<IRequerimentoSuspensaoRestricaoRepository, RequerimentoSuspensaoRestricaoRepository>();
+
             return services;
         }
     }
