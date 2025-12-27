@@ -4,6 +4,7 @@ using InfraDocs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfraDocs.Infrastructure.Migrations
 {
     [DbContext(typeof(InfraDocsDbContext))]
-    partial class InfraDocsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251227220910_SeedUsuarioInicial")]
+    partial class SeedUsuarioInicial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,44 +154,6 @@ namespace InfraDocs.Infrastructure.Migrations
                     b.HasIndex("OrganizacaoId");
 
                     b.ToTable("Pessoa");
-                });
-
-            modelBuilder.Entity("InfraDocs.Domain.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("InfraDocs.Domain.Entities.RequerimentoSuspensaoRestricao", b =>
@@ -360,17 +325,6 @@ namespace InfraDocs.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Organizacao");
-                });
-
-            modelBuilder.Entity("InfraDocs.Domain.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("InfraDocs.Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("InfraDocs.Domain.Entities.RequerimentoSuspensaoRestricao", b =>
