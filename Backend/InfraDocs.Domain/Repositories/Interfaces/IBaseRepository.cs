@@ -1,10 +1,10 @@
-﻿using InfraDocs.Domain.Entities;
+﻿
 
+using InfraDocs.Domain.Entities;
 
 namespace InfraDocs.Domain.Repositories.Interfaces
 {
-    public interface IBaseRepository<TEntity>
-        where TEntity : BaseEntity
+    public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     {
         IQueryable<TEntity> Query(bool asNoTracking = true);
 
