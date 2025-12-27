@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
 using InfraDocs.Domain.Entities;
-using InfraDocs.Shared.Dtos.Pessoa;
+using InfraDocs.Shared.Dtos.Usuario;
 
 namespace InfraDocs.Application.Mapping
 {
-    public class PessoaProfile : Profile
+    public class UsuarioProfile : Profile
     {
-        public PessoaProfile()
+        public UsuarioProfile()
         {
             // Entity -> ReadDto
-            CreateMap<Pessoa, ReadPessoaDto>();
+            CreateMap<Usuario, ReadUsuarioDto>();
 
             // CreateDto -> Entity
-            CreateMap<CreatePessoaDto, Pessoa>();
+            CreateMap<CreateUsuarioDto, Usuario>();
 
             // UpdateDto -> Entity
-            CreateMap<UpdatePessoaDto, Pessoa>()
+            CreateMap<UpdateUsuarioDto, Usuario>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.OrganizacaoId, opt => opt.Ignore());
         }
