@@ -23,6 +23,15 @@ namespace InfraDocs.Infrastructure.Repositories.Implementations
             _currentOrganizacao = currentOrganizacao;
         }
 
+        public async Task<IEnumerable<RequerimentoSuspensaoRestricao>> GetByPessoaIdAsync(int pessoaId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Where(x => x.OrganizacaoId == _currentOrganizacao.OrganizacaoId && x.PessoaId == pessoaId)
+                .OrderByDescending(x => x.NomeAssinante)
+                .ToListAsync();
+        }
+
         public override async Task<RequerimentoSuspensaoRestricao?> GetByIdAsync(int id)
         {
             return await _dbSet
@@ -51,7 +60,7 @@ namespace InfraDocs.Infrastructure.Repositories.Implementations
             var totalCount = await query.CountAsync();
 
             var items = await query
-                .OrderByDescending(x => x.CreatedAt)
+                .OrderByDescending(x => x.NomeAssinante)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

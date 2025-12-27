@@ -22,6 +22,13 @@ namespace InfraDocs.Infrastructure.Repositories.Implementations
             _currentOrganizacao = currentOrganizacao;
         }
 
+        public async Task<Usuario?> GetByEmailForLoginAsync(string email)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Email == email);
+        }
+
         public override async Task<Usuario?> GetByIdAsync(int id)
         {
             return await _dbSet
