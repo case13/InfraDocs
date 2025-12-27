@@ -1,5 +1,8 @@
-﻿using AutoMapper;
+﻿using InfraDocs.Application.Services.Implementations;
+using InfraDocs.Application.Services.Interfaces;
+using InfraDocs.Domain.Currents.Interfaces;
 using InfraDocs.Domain.Repositories.Interfaces;
+using InfraDocs.Infrastructure.Current.Implementations;
 using InfraDocs.Infrastructure.Data;
 using InfraDocs.Infrastructure.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +15,9 @@ namespace InfraDocs.Infrastructure.Configurations
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(
+            this IServiceCollection services, 
+            IConfiguration configuration)
         {
             services.AddDbContext<InfraDocsDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
@@ -24,6 +29,21 @@ namespace InfraDocs.Infrastructure.Configurations
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             services.AddScoped<IPessoaRepository, PessoaRepository>();
             services.AddScoped<IRequerimentoSuspensaoRestricaoRepository, RequerimentoSuspensaoRestricaoRepository>();
+
+
+            // Currents
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<ICurrentOrganizacao, CurrentOrganizacao>();
+
+            // Services
+            services.AddScoped<IOrganizacaoService, OrganizacaoService>();
+            services.AddScoped<IUsuarioService, UsuarioService>();
+            services.AddScoped<IPessoaService, PessoaService>();
+            services.AddScoped<IRequerimentoSuspensaoRestricaoService, RequerimentoSuspensaoRestricaoService>();
+
+            // TOKEN SERVICE
+            services.AddScoped<ITokenService, TokenService>();
 
             return services;
         }
