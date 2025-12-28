@@ -1,46 +1,44 @@
 ﻿using InfraDocs.Application.Services.Interfaces;
-using InfraDocs.Domain.Repositories.Interfaces;
+using InfraDocs.Shared.Dtos.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfraDocs.Api.Controllers
+[ApiController]
+[Route("api/auth")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/auth")]
-    public class AuthController : ControllerBase
+    private readonly IAuthService _authService;
+
+    public AuthController(IAuthService authService)
     {
-        private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ITokenService _tokenService;
+        _authService = authService;
+    }
 
-        public AuthController(
-            IUsuarioRepository usuarioRepository,
-            ITokenService tokenService)
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResultDto>> Login([FromBody] string email)
+    {
+        try
         {
-            _usuarioRepository = usuarioRepository;
-            _tokenService = tokenService;
+            return Ok(await _authService.LoginAsync(email));
         }
-
-        /// <summary>
-        /// Login inicial (sem senha por enquanto) – gera JWT
-        /// </summary>
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] string email)
+        catch (UnauthorizedAccessException e)
         {
-            if (string.IsNullOrWhiteSpace(email))
-                return BadRequest("E-mail é obrigatório.");
-            
-            var usuario = await _usuarioRepository.GetByEmailForLoginAsync(email);
+            return Unauthorized(e.Message);
+        }
+    }
 
-            if (usuario == null)
-                return Unauthorized("Usuário não encontrado.");
-            
-            var token = _tokenService.GenerateToken(usuario);
-
-            return Ok(new
-            {
-                accessToken = token
-            });
+    [AllowAnonymous]
+    [HttpPost("refresh")]
+    public async Task<ActionResult<LoginResultDto>> Refresh([FromBody] RefreshTokenDto dto)
+    {
+        try
+        {
+            return Ok(await _authService.RefreshAsync(dto.RefreshToken));
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(e.Message);
         }
     }
 }

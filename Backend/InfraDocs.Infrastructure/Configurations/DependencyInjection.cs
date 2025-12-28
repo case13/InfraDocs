@@ -22,13 +22,14 @@ namespace InfraDocs.Infrastructure.Configurations
             services.AddDbContext<InfraDocsDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // Repositórios
             services.AddScoped<IOrganizacaoRepository, OrganizacaoRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             services.AddScoped<IPessoaRepository, PessoaRepository>();
             services.AddScoped<IRequerimentoSuspensaoRestricaoRepository, RequerimentoSuspensaoRestricaoRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 
             // Currents
@@ -44,6 +45,8 @@ namespace InfraDocs.Infrastructure.Configurations
 
             // TOKEN SERVICE
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAuthService, AuthService>();
+
 
             return services;
         }

@@ -4,6 +4,7 @@ namespace InfraDocs.Application.Services.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(Usuario usuario);
+        string GenerateAccessToken(Usuario usuario);
+        RefreshToken GenerateRefreshToken();
     }
 }
