@@ -1,4 +1,5 @@
-﻿using InfraDocs.Application.Services.Interfaces;
+﻿using InfraDocs.Shared.Authorizations;
+using InfraDocs.Application.Services.Interfaces;
 using InfraDocs.Shared.Dtos.Pessoa;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace InfraDocs.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = PolicyNames.SomenteLeitura)]
     public class PessoaController : ControllerBase
     {
         private readonly IPessoaService _service;
@@ -17,9 +18,7 @@ namespace InfraDocs.Api.Controllers
             _service = service;
         }
 
-        /// <summary>
-        /// Lista todas as pessoas da organização logada
-        /// </summary>
+        // Leitura
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReadPessoaDto>>> GetAll()
         {
@@ -27,9 +26,6 @@ namespace InfraDocs.Api.Controllers
             return Ok(pessoas);
         }
 
-        /// <summary>
-        /// Obtém uma pessoa por ID
-        /// </summary>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ReadPessoaDto>> GetById(int id)
         {
@@ -41,9 +37,8 @@ namespace InfraDocs.Api.Controllers
             return Ok(pessoa);
         }
 
-        /// <summary>
-        /// Cria uma nova pessoa
-        /// </summary>
+        // Escrita
+        [Authorize(Policy = PolicyNames.AdminOuUsuario)]
         [HttpPost]
         public async Task<ActionResult<ReadPessoaDto>> Create(
             [FromBody] CreatePessoaDto dto)
@@ -56,9 +51,7 @@ namespace InfraDocs.Api.Controllers
             return Ok(pessoa);
         }
 
-        /// <summary>
-        /// Atualiza uma pessoa existente
-        /// </summary>
+        [Authorize(Policy = PolicyNames.AdminOuUsuario)]
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ReadPessoaDto>> Update(
             int id,
@@ -72,9 +65,7 @@ namespace InfraDocs.Api.Controllers
             return Ok(pessoa);
         }
 
-        /// <summary>
-        /// Remove uma pessoa
-        /// </summary>
+        [Authorize(Policy = PolicyNames.Administrador)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

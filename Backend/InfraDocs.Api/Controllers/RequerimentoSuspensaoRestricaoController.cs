@@ -1,4 +1,5 @@
-﻿using InfraDocs.Application.Services.Interfaces;
+﻿using InfraDocs.Shared.Authorizations;
+using InfraDocs.Application.Services.Interfaces;
 using InfraDocs.Shared.Dtos.RequerimentoSuspensaoRestricao;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace InfraDocs.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOuUsuario)]
     public class RequerimentoSuspensaoRestricaoController : ControllerBase
     {
         private readonly IRequerimentoSuspensaoRestricaoService _service;
@@ -18,9 +19,7 @@ namespace InfraDocs.Api.Controllers
             _service = service;
         }
 
-        /// <summary>
-        /// Lista todos os requerimentos da organização logada
-        /// </summary>
+        // Leitura
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReadRequerimentoSuspensaoRestricaoDto>>> GetAll()
         {
@@ -28,9 +27,6 @@ namespace InfraDocs.Api.Controllers
             return Ok(itens);
         }
 
-        /// <summary>
-        /// Obtém um requerimento por ID
-        /// </summary>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ReadRequerimentoSuspensaoRestricaoDto>> GetById(int id)
         {
@@ -42,9 +38,7 @@ namespace InfraDocs.Api.Controllers
             return Ok(item);
         }
 
-        /// <summary>
-        /// Cria um novo requerimento
-        /// </summary>
+        // Escrita
         [HttpPost]
         public async Task<ActionResult<ReadRequerimentoSuspensaoRestricaoDto>> Create(
             [FromBody] CreateRequerimentoSuspensaoRestricaoDto dto)
@@ -57,9 +51,6 @@ namespace InfraDocs.Api.Controllers
             return Ok(item);
         }
 
-        /// <summary>
-        /// Atualiza um requerimento existente
-        /// </summary>
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ReadRequerimentoSuspensaoRestricaoDto>> Update(
             int id,
@@ -73,9 +64,7 @@ namespace InfraDocs.Api.Controllers
             return Ok(item);
         }
 
-        /// <summary>
-        /// Remove um requerimento
-        /// </summary>
+        [Authorize(Policy = PolicyNames.Administrador)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

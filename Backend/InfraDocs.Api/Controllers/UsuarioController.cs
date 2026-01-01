@@ -1,4 +1,5 @@
-﻿using InfraDocs.Application.Services.Interfaces;
+﻿using InfraDocs.Shared.Authorizations;
+using InfraDocs.Application.Services.Interfaces;
 using InfraDocs.Shared.Dtos.Usuario;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace InfraDocs.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOuUsuario)]
     public class UsuarioController : ControllerBase
     {
         private readonly IUsuarioService _service;
@@ -17,9 +18,7 @@ namespace InfraDocs.Api.Controllers
             _service = service;
         }
 
-        /// <summary>
-        /// Lista todos os usuários da organização logada
-        /// </summary>
+        // Leitura
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReadUsuarioDto>>> GetAll()
         {
@@ -27,9 +26,6 @@ namespace InfraDocs.Api.Controllers
             return Ok(usuarios);
         }
 
-        /// <summary>
-        /// Busca usuário por ID (respeitando organização)
-        /// </summary>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ReadUsuarioDto>> GetById(int id)
         {
@@ -41,12 +37,10 @@ namespace InfraDocs.Api.Controllers
             return Ok(usuario);
         }
 
-        /// <summary>
-        /// Cria um novo usuário
-        /// </summary>
+        // Escrita
+        [Authorize(Policy = PolicyNames.Administrador)]
         [HttpPost]
-        public async Task<ActionResult<ReadUsuarioDto>> Create(
-            [FromBody] CreateUsuarioDto dto)
+        public async Task<ActionResult<ReadUsuarioDto>> Create([FromBody] CreateUsuarioDto dto)
         {
             var usuario = await _service.CreateAsync(dto);
 
@@ -56,9 +50,6 @@ namespace InfraDocs.Api.Controllers
             return Ok(usuario);
         }
 
-        /// <summary>
-        /// Atualiza um usuário existente
-        /// </summary>
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ReadUsuarioDto>> Update(
             int id,
@@ -72,9 +63,7 @@ namespace InfraDocs.Api.Controllers
             return Ok(usuario);
         }
 
-        /// <summary>
-        /// Remove (inativa) um usuário
-        /// </summary>
+        [Authorize(Policy = PolicyNames.Administrador)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

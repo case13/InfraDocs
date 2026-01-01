@@ -1,5 +1,6 @@
 ﻿using InfraDocs.Application.Services.Interfaces;
 using InfraDocs.Shared.Dtos.Organizacao;
+using InfraDocs.Shared.Authorizations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace InfraDocs.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = PolicyNames.AdminOuUsuario)]
     public class OrganizacaoController : ControllerBase
     {
         private readonly IOrganizacaoService _service;
@@ -16,10 +18,7 @@ namespace InfraDocs.Api.Controllers
             _service = service;
         }
 
-        /// <summary>
-        /// Lista todas as organizações
-        /// </summary>
-        [Authorize]
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReadOrganizacaoDto>>> GetAll()
         {
@@ -27,11 +26,7 @@ namespace InfraDocs.Api.Controllers
             return Ok(organizacoes);
         }
 
-        /// <summary>
-        /// Obtém uma organização por ID
-        /// </summary>
-        [Authorize]
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<ReadOrganizacaoDto>> GetById(int id)
         {
             var organizacao = await _service.GetByIdAsync(id);
@@ -42,11 +37,19 @@ namespace InfraDocs.Api.Controllers
             return Ok(organizacao);
         }
 
-        /// <summary>
-        /// Cria uma nova organização
-        /// (permitido sem autenticação para onboarding)
-        /// </summary>
-        [AllowAnonymous]
+        [HttpGet("documento/{documento}")]
+        public async Task<ActionResult<ReadOrganizacaoDto>> GetByDocumento(string documento)
+        {
+            var organizacao = await _service.GetByDocumentoAsync(documento);
+
+            if (organizacao == null || organizacao.Id == 0)
+                return NotFound("Organização não encontrada.");
+
+            return Ok(organizacao);
+        }
+        
+
+        [Authorize(Policy = PolicyNames.Administrador)]
         [HttpPost]
         public async Task<ActionResult<ReadOrganizacaoDto>> Create(
             [FromBody] CreateOrganizacaoDto dto)
@@ -59,11 +62,8 @@ namespace InfraDocs.Api.Controllers
             return Ok(organizacao);
         }
 
-        /// <summary>
-        /// Atualiza uma organização existente
-        /// </summary>
-        [Authorize]
-        [HttpPut("{id:int}")]
+        [Authorize(Policy = PolicyNames.Administrador)]
+        [HttpPut("{id}")]
         public async Task<ActionResult<ReadOrganizacaoDto>> Update(
             int id,
             [FromBody] UpdateOrganizacaoDto dto)
@@ -76,19 +76,16 @@ namespace InfraDocs.Api.Controllers
             return Ok(organizacao);
         }
 
-        /// <summary>
-        /// Busca organização pelo documento (CPF/CNPJ)
-        /// </summary>
-        [Authorize]
-        [HttpGet("documento/{documento}")]
-        public async Task<ActionResult<ReadOrganizacaoDto>> GetByDocumento(string documento)
+        [Authorize(Policy = PolicyNames.Administrador)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            var organizacao = await _service.GetByDocumentoAsync(documento);
+            var result = await _service.DeleteAsync(id);
 
-            if (organizacao == null || organizacao.Id == 0)
-                return NotFound("Organização não encontrada com esse documento.");
+            if (!result)
+                return NotFound("Organização não encontrada para exclusão.");
 
-            return Ok(organizacao);
+            return NoContent();
         }
     }
 }

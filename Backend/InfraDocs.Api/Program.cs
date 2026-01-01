@@ -1,5 +1,8 @@
-using InfraDocs.Infrastructure.Configurations;
+using InfraDocs.Shared.Authorizations;
+using InfraDocs.Api.Authorization.Requirements;
 using InfraDocs.Api.Configurations;
+using InfraDocs.Infrastructure.Configurations;
+using InfraDocs.Shared.Enums;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -20,33 +23,10 @@ internal class Program
         // Swagger
         builder.Services.AddSwaggerConfiguration();
 
-
         // Auth
-        builder.Services
-        .AddAuthentication(options =>
-        {
-           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-           options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-           options.TokenValidationParameters = new TokenValidationParameters
-           {
-              ValidateIssuer = true,
-              ValidateAudience = true,
-              ValidateLifetime = true,
-              ValidateIssuerSigningKey = true,
+        builder.Services.AddJwtAuthentication(builder.Configuration);
 
-              ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-              ValidAudience = builder.Configuration["JwtSettings:Audience"],
-              IssuerSigningKey = new SymmetricSecurityKey(
-                   Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!)
-              ),
-
-            ClockSkew = TimeSpan.Zero
-           };
-        });
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorizationConfiguration();
 
         var app = builder.Build();
 

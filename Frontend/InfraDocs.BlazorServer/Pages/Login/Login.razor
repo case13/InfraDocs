@@ -1,0 +1,49 @@
+﻿@page "/login"
+@attribute [AllowAnonymous]
+
+@using InfraDocs.BlazorServer.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<h3>Login</h3>
+
+@if (!string.IsNullOrWhiteSpace(_error))
+{
+    <p style="color:red">@_error</p>
+}
+
+<div>
+    <input @bind="_email"
+           placeholder="E-mail"
+           type="email" />
+
+    <button @onclick="LoginAsync">
+        Entrar
+    </button>
+</div>
+
+@code {
+    private string _email = string.Empty;
+    private string? _error;
+
+    private async Task LoginAsync()
+    {
+        _error = null;
+
+        if (string.IsNullOrWhiteSpace(_email))
+        {
+            _error = "Informe o e-mail.";
+            return;
+        }
+
+        var success = await AuthService.LoginAsync(_email);
+
+        if (!success)
+        {
+            _error = "Falha no login.";
+            return;
+        }
+
+        Navigation.NavigateTo("/");
+    }
+}
