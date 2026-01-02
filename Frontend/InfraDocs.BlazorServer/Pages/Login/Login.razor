@@ -23,7 +23,7 @@
 </div>
 
 @code {
-    private string _email = string.Empty;
+    private string _email = "anderson.infosistemas@gmail.com";
     private string? _error;
 
     private async Task LoginAsync()
@@ -44,6 +44,6 @@
             return;
         }
 
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/", replace: true);
     }
 }

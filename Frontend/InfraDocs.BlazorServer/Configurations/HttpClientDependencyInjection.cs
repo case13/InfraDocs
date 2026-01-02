@@ -1,27 +1,25 @@
-﻿using InfraDocs.BlazorServer.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace InfraDocs.BlazorServer.Configurations
 {
     public static class HttpClientDependencyInjection
     {
-        public static IServiceCollection AddHttpClientConfiguration(
+        public static IServiceCollection AddApiHttpClient(
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddHttpClient<ApiHttpClient>(client =>
-            {
-                client.BaseAddress = new Uri(
-                    configuration["ApiSettings:BaseUrl"]!
-                );
-            });
-
             services.AddScoped(sp =>
-                sp.GetRequiredService<ApiHttpClient>().HttpClient
-            );
+            {
+                var apiBaseUrl = configuration["ApiSettings:BaseUrl"];
+
+                return new HttpClient
+                {
+                    BaseAddress = new Uri(apiBaseUrl!)
+                };
+            });
 
             return services;
         }
     }
 }
+

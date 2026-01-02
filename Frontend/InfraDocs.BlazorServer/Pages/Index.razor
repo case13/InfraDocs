@@ -1,12 +1,14 @@
 ﻿@page "/"
+@using InfraDocs.BlazorServer.Components
 @attribute [Authorize]
 @inject NavigationManager Nav
 
-<h1>Hello, world!</h1>
+<h2>Dashboard</h2>
+
+<p>Bem-vindo ao InfraDocs</p>
+
+<HomeMenu />
 
 @code {
-    protected override void OnInitialized()
-    {
-        Nav.NavigateTo("/dashboard", true);
-    }
+    
 }

@@ -1,4 +1,5 @@
 using InfraDocs.BlazorServer.Authentications;
+using InfraDocs.BlazorServer.Configurations;
 using InfraDocs.BlazorServer.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -15,6 +16,8 @@ builder.Services.AddHttpClient();
 // Auth core
 builder.Services.AddAuthorizationCore();
 
+builder.Services.AddAuthorizationConfiguration();
+
 // registra o tipo concreto
 builder.Services.AddScoped<AuthStateProvider>();
 
@@ -28,7 +31,7 @@ builder.Services.AddScoped<ProtectedSessionStorage>();
 
 // Services
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<ApiHttpClient>();
+builder.Services.AddApiHttpClient(builder.Configuration);
 
 var app = builder.Build();
 

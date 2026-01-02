@@ -1,0 +1,26 @@
+﻿@using InfraDocs.Shared.Authorizations
+@using Microsoft.AspNetCore.Authorization
+
+<div class="home-menu">
+
+    <AuthorizeView Policy="@PolicyNames.Administrador">
+        <button @onclick="GoOrganizacoes">
+            Organizações
+        </button>
+    </AuthorizeView>
+
+    <AuthorizeView Policy="@PolicyNames.AdminOuUsuario">
+        <button @onclick="GoUsuarios">
+            Usuários
+        </button>
+    </AuthorizeView>
+
+</div>
+
+@code {
+    [Inject] NavigationManager Nav { get; set; } = default!;
+    void GoOrganizacoes() => Nav.NavigateTo("/organizacoes");
+    void GoUsuarios() => Nav.NavigateTo("/usuarios");
+    
+    void Go(string route) => Nav.NavigateTo(route);
+}

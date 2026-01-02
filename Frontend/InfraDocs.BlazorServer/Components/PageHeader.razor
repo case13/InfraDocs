@@ -1,0 +1,23 @@
+﻿<div class="page-header">
+    <button @onclick="GoHome">
+        Home
+    </button>
+
+    <button @onclick="GoBack">
+        Voltar
+    </button>
+</div>
+
+@code {
+    [Inject] NavigationManager Navigation { get; set; } = default!;
+
+    void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    void GoBack()
+    {
+        Navigation.NavigateTo("/", false);
+    }
+}
