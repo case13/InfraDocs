@@ -1,5 +1,11 @@
 ﻿@using InfraDocs.BlazorServer.Layouts
 @using InfraDocs.BlazorServer.Utils
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">

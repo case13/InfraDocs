@@ -1,5 +1,4 @@
-﻿using InfraDocs.BlazorServer.Authentications;
-using InfraDocs.Shared.Dtos.Auth;
+﻿using InfraDocs.Shared.Dtos.Auth;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Net.Http.Json;
 
@@ -8,82 +7,54 @@ namespace InfraDocs.BlazorServer.Services
     public class AuthService
     {
         private readonly HttpClient _http;
-        private readonly AuthStateProvider _authStateProvider;
-        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly ProtectedSessionStorage _storage;
 
+        private string? _cachedToken;
+
+        private const string AccessTokenKey = "access_token";
         private const string RefreshTokenKey = "refresh_token";
 
         public AuthService(
-            HttpClient http,
-            AuthStateProvider authStateProvider,
-            ProtectedSessionStorage sessionStorage)
+            IHttpClientFactory factory,
+            ProtectedSessionStorage storage)
         {
-            _http = http;
-            _authStateProvider = authStateProvider;
-            _sessionStorage = sessionStorage;
+            _http = factory.CreateClient("Api"); 
+            _storage = storage;
+        }
+
+        public async Task<string?> GetTokenAsync()
+        {
+            if (!string.IsNullOrWhiteSpace(_cachedToken))
+                return _cachedToken;
+
+            var result = await _storage.GetAsync<string>(AccessTokenKey);
+            _cachedToken = result.Success ? result.Value : null;
+            return _cachedToken;
         }
 
         public async Task<bool> LoginAsync(string email)
         {
-            var response = await _http.PostAsJsonAsync(
-                "/api/auth/login",
-                email);
-
+            var response = await _http.PostAsJsonAsync("/api/auth/login", email);
             if (!response.IsSuccessStatusCode)
                 return false;
 
-            var result =
-                await response.Content.ReadFromJsonAsync<LoginResultDto>();
-
-            if (result == null || string.IsNullOrWhiteSpace(result.AccessToken))
+            var result = await response.Content.ReadFromJsonAsync<LoginResultDto>();
+            if (string.IsNullOrWhiteSpace(result?.AccessToken))
                 return false;
 
-            // refresh token
-            await _sessionStorage.SetAsync(RefreshTokenKey, result.RefreshToken);
+            _cachedToken = result.AccessToken;
 
-            // atualiza o estado global de auth
-            await _authStateProvider.SetLoginAsync(result.AccessToken);
+            await _storage.SetAsync(AccessTokenKey, result.AccessToken);
+            await _storage.SetAsync(RefreshTokenKey, result.RefreshToken);
 
             return true;
         }
 
-        public async Task<bool> RefreshTokenAsync()
+        public async Task ClearAsync()
         {
-            var refreshTokenResult =
-                await _sessionStorage.GetAsync<string>(RefreshTokenKey);
-
-            if (!refreshTokenResult.Success ||
-                string.IsNullOrWhiteSpace(refreshTokenResult.Value))
-                return false;
-
-            var dto = new RefreshTokenDto
-            {
-                RefreshToken = refreshTokenResult.Value
-            };
-
-            var response = await _http.PostAsJsonAsync(
-                "/api/auth/refresh",
-                dto);
-
-            if (!response.IsSuccessStatusCode)
-                return false;
-
-            var result =
-                await response.Content.ReadFromJsonAsync<LoginResultDto>();
-
-            if (result == null || string.IsNullOrWhiteSpace(result.AccessToken))
-                return false;
-
-            await _sessionStorage.SetAsync(RefreshTokenKey, result.RefreshToken);
-            await _authStateProvider.SetLoginAsync(result.AccessToken);
-
-            return true;
-        }
-
-        public async Task LogoutAsync()
-        {
-            await _sessionStorage.DeleteAsync(RefreshTokenKey);
-            await _authStateProvider.LogoutAsync();
+            _cachedToken = null;
+            await _storage.DeleteAsync(AccessTokenKey);
+            await _storage.DeleteAsync(RefreshTokenKey);
         }
     }
 }

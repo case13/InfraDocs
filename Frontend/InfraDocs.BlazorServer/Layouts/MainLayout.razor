@@ -1,7 +1,36 @@
-﻿
-
+﻿@using InfraDocs.BlazorServer.Components.Navigation
 @inherits LayoutComponentBase
+@inject NavigationManager Nav
 
-<div class="main-layout">
-    @Body
-</div>
+
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+
+            @if (IsHome)
+            {
+                <MudDrawer Open="true"
+                           Variant="DrawerVariant.Persistent"
+                           Elevation="1"
+                           Width="260px">
+                    <SideNav />
+                </MudDrawer>
+            }
+
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+
+        </MudLayout>
+    </Authorized>
+
+    <NotAuthorized>
+        @Body
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool IsHome =>
+        Nav.Uri.EndsWith("/", StringComparison.OrdinalIgnoreCase) ||
+        Nav.Uri.EndsWith("/index", StringComparison.OrdinalIgnoreCase);
+}

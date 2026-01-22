@@ -1,0 +1,28 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<div class="secondary-layout">
+
+    <header class="secondary-header">
+        <button @onclick="GoBack">Voltar</button>
+
+        <button @onclick="GoHome">Home</button>
+    </header>
+
+    <main class="secondary-content">
+        @Body
+    </main>
+
+</div>
+
+@code {
+    void GoBack()
+    {
+        Navigation.NavigateTo("javascript:history.back()");
+    }
+
+    void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

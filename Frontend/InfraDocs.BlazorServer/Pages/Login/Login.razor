@@ -3,27 +3,62 @@
 
 @using InfraDocs.BlazorServer.Services
 @inject AuthService AuthService
-@inject NavigationManager Navigation
+@inject NavigationManager Nav
 
-<h3>Login</h3>
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="height:100vh;">
+    <MudPaper Elevation="8" Class="pa-6" Style="width:100%; max-width:420px;">
 
-@if (!string.IsNullOrWhiteSpace(_error))
-{
-    <p style="color:red">@_error</p>
-}
+        <MudStack Spacing="3">
 
-<div>
-    <input @bind="_email"
-           placeholder="E-mail"
-           type="email" />
+            <MudAvatar Icon="@Icons.Material.Filled.Person"
+                       Size="Size.Large"
+                       Color="Color.Primary"
+                       Class="mx-auto">
+                <MudIcon Color="Color.Surface" Icon="@Icons.Material.Filled.Person" Size="Size.Large" />
+            </MudAvatar>
 
-    <button @onclick="LoginAsync">
-        Entrar
-    </button>
-</div>
+            <MudText Typo="Typo.h5" Align="Align.Center">
+                Login
+            </MudText>
+
+            <MudTextField T="string"
+                          Label="Email"
+                          Variant="Variant.Outlined"
+                          @bind-Value="_email"
+                          FullWidth />
+
+            <MudTextField T="string"
+                          Label="Password"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Password"
+                          FullWidth />
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <MudText Typo="Typo.body2" Color="Color.Error" Align="Align.Center">
+                    @_error
+                </MudText>
+            }
+
+            <MudCheckBox T="bool"
+                         @bind-Checked="_rememberMe"
+                         Label="Remember me" />
+
+            <MudButton Color="Color.Primary"
+                       Variant="Variant.Filled"
+                       FullWidth
+                       OnClick="LoginAsync">
+                LOGIN
+            </MudButton>
+
+        </MudStack>
+
+    </MudPaper>
+</MudContainer>
+
 
 @code {
     private string _email = "anderson.infosistemas@gmail.com";
+    private bool _rememberMe;
     private string? _error;
 
     private async Task LoginAsync()
@@ -44,6 +79,7 @@
             return;
         }
 
-        Navigation.NavigateTo("/", replace: true);
+        await InvokeAsync(StateHasChanged);
+        Nav.NavigateTo("/", forceLoad: true);
     }
 }

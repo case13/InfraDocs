@@ -1,0 +1,6 @@
+﻿@page "/organizacao"
+@using InfraDocs.BlazorServer.Layouts.SecondaryLayout
+@layout SecondaryLayout
+@attribute [Authorize(Policy = PolicyNames.Administrador)]
+
+<h3>Organizações</h3>

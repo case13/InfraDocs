@@ -41,6 +41,11 @@ internal class Program
             });
         }
 
+        Console.WriteLine("ISSUER  : " + builder.Configuration["JwtSettings:Issuer"]);
+        Console.WriteLine("AUDIENCE: " + builder.Configuration["JwtSettings:Audience"]);
+        Console.WriteLine("KEY OK? : " + !string.IsNullOrWhiteSpace(builder.Configuration["JwtSettings:Key"]));
+
+
         app.UseHttpsRedirection();
 
         app.UseAuthentication();

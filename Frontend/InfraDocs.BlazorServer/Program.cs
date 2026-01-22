@@ -1,37 +1,23 @@
-using InfraDocs.BlazorServer.Authentications;
 using InfraDocs.BlazorServer.Configurations;
-using InfraDocs.BlazorServer.Services;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using InfraDocs.Frontend.Configurations;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Blazor
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
 
-// HTTP
-builder.Services.AddHttpClient();
-
-// Auth core
-builder.Services.AddAuthorizationCore();
-
+// Auth (TUDO centralizado)
+builder.Services.AddAuthenticationConfiguration();
 builder.Services.AddAuthorizationConfiguration();
 
-// registra o tipo concreto
-builder.Services.AddScoped<AuthStateProvider>();
-
-// registra o contrato base apontando para o mesmo objeto
-builder.Services.AddScoped<AuthenticationStateProvider>(
-    sp => sp.GetRequiredService<AuthStateProvider>()
-);
-
-// Storage seguro
-builder.Services.AddScoped<ProtectedSessionStorage>();
+// HttpClient
+builder.Services.AddApiHttpClient(builder.Configuration);
 
 // Services
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddApiHttpClient(builder.Configuration);
+builder.Services.AddFrontendServices();
 
 var app = builder.Build();
 

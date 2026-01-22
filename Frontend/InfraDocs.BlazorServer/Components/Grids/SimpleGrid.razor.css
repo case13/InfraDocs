@@ -1,0 +1,9 @@
+﻿.fab-custom {
+   background-color: darkred;
+   color: white;  
+}
+
+.fab-custom:hover {
+   background-color: red;
+}
+

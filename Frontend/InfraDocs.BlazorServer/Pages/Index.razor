@@ -1,14 +1,33 @@
 ﻿@page "/"
 @using InfraDocs.BlazorServer.Components
+@using InfraDocs.BlazorServer.Components.Navigation
 @attribute [Authorize]
 @inject NavigationManager Nav
 
-<h2>Dashboard</h2>
+<MudContainer MaxWidth="MaxWidth.False" Class="pa-0">
+    <MudStack Direction="Row">
 
-<p>Bem-vindo ao InfraDocs</p>
+        <MudContainer MaxWidth="MaxWidth.False" Class="pa-6">
+            <h2>Dashboard</h2>
+            <p>Bem-vindo ao InfraDocs</p>
 
-<HomeMenu />
+            <AuthorizeView>
+                <Authorized>
+                    @if (IsHome)
+                    {
+                        <HomeMenu />
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </MudContainer>
+
+    </MudStack>
+</MudContainer>
+
 
 @code {
+    private bool IsHome =>
+        Nav.Uri.EndsWith("/", StringComparison.OrdinalIgnoreCase) ||
+        Nav.Uri.EndsWith("/index", StringComparison.OrdinalIgnoreCase);
     
 }

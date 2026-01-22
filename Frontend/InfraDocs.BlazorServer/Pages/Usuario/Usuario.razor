@@ -1,7 +1,105 @@
 ﻿@page "/usuarios"
-@using InfraDocs.BlazorServer.Components
-@attribute [Authorize(Policy = PolicyNames.AdminOuUsuario)]
+@attribute [Authorize]
 
-<PageHeader />
+@using InfraDocs.BlazorServer.Components.Grids
+@using InfraDocs.BlazorServer.ViewModels.Interfaces
+@using InfraDocs.Shared.Dtos.Usuario
+@using InfraDocs.Shared.Enums
+@using InfraDocs.BlazorServer.Utils.Dialogs
 
-<h3>Usuários</h3>
+@inject NavigationManager Nav
+@inject IUsuarioViewModel Vm
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<SimpleGrid TItem="ReadUsuarioDto"
+            Title="Usuários"
+            Subtitle="Usuários cadastrados no sistema"
+            AddHref="/usuario/add"
+            ServerData="LoadData">
+
+    <Header>
+        <MudTh>Nome</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Tipo</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh Class="text-right">Ações</MudTh>
+    </Header>
+
+    <RowTemplate Context="u">
+        <MudTd>@u.Nome</MudTd>
+        <MudTd>@u.Email</MudTd>
+        <MudTd>@u.TipoUsuario</MudTd>
+        <MudTd>
+            @if (u.StatusUsuario == StatusBasicoEnum.Ativo)
+            {
+                <MudChip T="string" Color="Color.Success" Size="Size.Small">
+                    Ativo
+                </MudChip>
+            }
+            else
+            {
+                <MudChip T="string" Color="Color.Error" Size="Size.Small">
+                    Inativo
+                </MudChip>
+            }
+        </MudTd>
+
+        <MudTd Class="text-right">
+            <MudIconButton Icon="@Icons.Material.TwoTone.Edit"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           OnClick="@(() => Editar(u.Id))" />
+
+            <MudIconButton Icon="@Icons.Material.TwoTone.Delete"
+                           Color="Color.Error"
+                           Size="Size.Small"
+                           OnClick="@(() => Excluir(u.Id))" />
+        </MudTd>
+    </RowTemplate>
+
+</SimpleGrid>
+
+@code {
+
+    private async Task<TableData<ReadUsuarioDto>> LoadData(TableState state, CancellationToken ct)
+    {
+        Vm.DefinirPagina(state.Page + 1);
+        Vm.PageSize = state.PageSize;   
+        await Vm.CarregarPaginadoAsync();
+        return new TableData<ReadUsuarioDto>()
+        {
+            Items = Vm.Usuarios,
+            TotalItems = Vm.TotalCount
+        };
+    }
+
+    private void Editar(int id)
+        => Nav.NavigateTo($"/usuario/edit/{id}");
+
+    private async Task Excluir(int id)
+    {
+        var confirm = await DialogService.ShowConfirmDialogAsync(
+            title: "Excluir Usuário",
+            message: "Tem certeza que deseja excluir este usuário?",
+            confirmText: "Excluir",
+            cancelText: "Cancelar",
+            confirmColor: Color.Error);
+
+        if (!confirm)
+            return;
+
+        var ok = await Vm.ExcluirAsync(id);
+
+        if (ok)
+        {
+            Snackbar.Add("Usuário excluído com sucesso.", Severity.Success);
+            // Se quiser forçar recarga, pode depois expor um método no ConsultaGrid para chamar ReloadAsync()
+        }
+        else
+        {
+            Snackbar.Add("Não foi possível excluir o usuário.", Severity.Error);
+        }
+    }
+
+}

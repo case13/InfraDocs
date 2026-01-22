@@ -3,6 +3,7 @@ using InfraDocs.Application.Services.Interfaces;
 using InfraDocs.Shared.Dtos.Usuario;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using InfraDocs.Shared.Dtos.Common;
 
 namespace InfraDocs.Api.Controllers
 {
@@ -16,6 +17,17 @@ namespace InfraDocs.Api.Controllers
         public UsuarioController(IUsuarioService service)
         {
             _service = service;
+        }
+
+        [HttpGet("paginado")]
+        public async Task<ActionResult<PagedResultDto<ReadUsuarioDto>>> GetPaged(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? filterColumn = null,
+            [FromQuery] string? filterText = null)
+        {
+            var result = await _service.GetPagedAsync(pageNumber, pageSize, filterColumn, filterText);
+            return Ok(result);
         }
 
         // Leitura

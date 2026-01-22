@@ -1,0 +1,49 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.login-root {
+    height: 100vh;
+}
+
+.login-grid {
+    height: 100%;
+}
+
+/* Painel esquerdo */
+.left-panel {
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.left-content {
+    max-width: 420px;
+    padding: 40px;
+}
+
+/* Painel direito */
+.right-panel {
+    background: linear-gradient(135deg, #2f4bcf, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    color: white;
+}
+
+    /* Inputs arredondados */
+    .login-card .mud-input-control {
+        background: white;
+        border-radius: 30px;
+    }
+
+    .login-card input {
+        padding-left: 18px;
+    }

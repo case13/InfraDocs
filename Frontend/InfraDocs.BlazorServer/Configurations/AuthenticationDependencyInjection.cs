@@ -1,8 +1,6 @@
-﻿using InfraDocs.BlazorServer.Pages;
-using InfraDocs.BlazorServer.Authentications;
+﻿using InfraDocs.BlazorServer.Authentications;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace InfraDocs.Frontend.Configurations
 {
@@ -15,7 +13,10 @@ namespace InfraDocs.Frontend.Configurations
 
             services.AddScoped<ProtectedSessionStorage>();
 
-            services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+            services.AddScoped<AuthStateProvider>();
+
+            services.AddScoped<AuthenticationStateProvider>(
+                sp => sp.GetRequiredService<AuthStateProvider>());
 
             return services;
         }

@@ -1,0 +1,106 @@
+﻿@typeparam TItem
+
+@using MudBlazor
+@inject NavigationManager Nav
+
+<MudPaper Class="pa-4">
+
+    <MudStack Row AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+
+        @if (GoHomeVisible)
+        {
+            <MudFab StartIcon="@Icons.Material.Filled.Home"
+                    Size="Size.Small"
+                    Class="fab-custom"
+                    OnClick="@(() => Nav.NavigateTo(HomeHref))" />
+        }
+
+        @if (GoBackVisible)
+        {
+            <MudFab StartIcon="@Icons.Material.Filled.ArrowBack"
+                    Size="Size.Small"
+                    Class="fab-custom"
+                    OnClick="@GoBack" />
+        }
+
+        <MudText Typo="Typo.h6" Class="ml-2">
+            @Title
+        </MudText>
+    </MudStack>
+
+    @if (!string.IsNullOrWhiteSpace(Subtitle))
+    {
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-3">
+            @Subtitle
+        </MudText>
+    }
+
+    <MudStack Row Justify="Justify.FlexEnd" Spacing="2" Class="mb-2">
+        <MudButton Variant="Variant.Filled" OnClick="ReloadAsync">
+            Buscar
+        </MudButton>
+
+        <MudFab Icon="@Icons.Material.Filled.Add"
+                Size="Size.Small"
+                Class="fab-custom"
+                OnClick="@(() => Nav.NavigateTo(AddHref))" />
+    </MudStack>
+
+    <MudTable T="TItem"
+              @ref="_table"
+              ServerData="ServerData"
+              Dense="true"
+              RowsPerPage="10">
+
+        <HeaderContent>
+            @Header
+        </HeaderContent>
+
+        <RowTemplate Context="row">
+            @RowTemplate(row)
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+
+    </MudTable>
+
+</MudPaper>
+
+@code {
+
+    [Parameter] public string Title { get; set; } = "Consulta";
+    [Parameter] public string? Subtitle { get; set; }
+
+    [Parameter] public bool GoHomeVisible { get; set; } = true;
+    [Parameter] public bool GoBackVisible { get; set; } = true;
+
+    [Parameter] public string HomeHref { get; set; } = "/";
+    [Parameter] public string AddHref { get; set; } = "#";
+    [Parameter] public string? BackHref { get; set; }
+
+    [Parameter] public Func<TableState, CancellationToken, Task<TableData<TItem>>> ServerData { get; set; } = default!;
+    [Parameter] public RenderFragment Header { get; set; } = default!;
+    [Parameter] public RenderFragment<TItem> RowTemplate { get; set; } = default!;
+
+    private MudTable<TItem>? _table;
+
+    private void GoBack()
+    {
+        if (!string.IsNullOrWhiteSpace(BackHref))
+            Nav.NavigateTo(BackHref);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await ReloadAsync();
+    }
+
+    public async Task ReloadAsync()
+    {
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+}

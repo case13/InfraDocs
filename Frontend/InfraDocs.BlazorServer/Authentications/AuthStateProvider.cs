@@ -1,59 +1,49 @@
-﻿using InfraDocs.BlazorServer.Utils;
-using InfraDocs.Shared.Dtos.Auth;
+﻿using InfraDocs.BlazorServer.Services;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace InfraDocs.BlazorServer.Authentications
 {
     public class AuthStateProvider : AuthenticationStateProvider
     {
-        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly AuthService _authService;
 
-        private const string AccessTokenKey = "access_token";
-
-        public AuthStateProvider(ProtectedSessionStorage sessionStorage)
+        public AuthStateProvider(AuthService authService)
         {
-            _sessionStorage = sessionStorage;
+            _authService = authService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var tokenResult = await _sessionStorage.GetAsync<string>(AccessTokenKey);
+            var token = await _authService.GetTokenAsync();
 
-            if (!tokenResult.Success || string.IsNullOrWhiteSpace(tokenResult.Value))
-            {
-                return new AuthenticationState(
-                    new ClaimsPrincipal(new ClaimsIdentity())
-                );
-            }
+            if (string.IsNullOrWhiteSpace(token))
+                return new AuthenticationState(new ClaimsPrincipal(
+                    new ClaimsIdentity()));
 
-            var claims = JwtParser.ParseClaimsFromJwt(tokenResult.Value);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
 
-            var identity = new ClaimsIdentity(claims, "jwt");
+            var identity = new ClaimsIdentity(
+                jwt.Claims,
+                authenticationType: "jwt");
+
             var user = new ClaimsPrincipal(identity);
 
             return new AuthenticationState(user);
         }
 
-        public async Task SetLoginAsync(string accessToken)
+        public void NotifyUserAuthenticationStateChanged()
         {
-            await _sessionStorage.SetAsync(AccessTokenKey, accessToken);
-
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
-        public async Task LogoutAsync()
+        public void NotifyUserLogout()
         {
-            await _sessionStorage.DeleteAsync(AccessTokenKey);
-
+            var anon = new ClaimsPrincipal(new ClaimsIdentity());
             NotifyAuthenticationStateChanged(
-                Task.FromResult(
-                    new AuthenticationState(
-                        new ClaimsPrincipal(new ClaimsIdentity())
-                    )
-                )
-            );
+                Task.FromResult(new AuthenticationState(anon)));
         }
     }
 }

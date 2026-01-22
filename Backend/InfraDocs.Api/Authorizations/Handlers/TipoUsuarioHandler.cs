@@ -10,16 +10,41 @@ namespace InfraDocs.Api.Authorization.Handlers
             AuthorizationHandlerContext context,
             TipoUsuarioRequirement requirement)
         {
-            var claim = context.User.FindFirst("tipo_usuario");
+            Console.WriteLine("=== TipoUsuarioHandler EXECUTOU ===");
+            Console.WriteLine("IsAuthenticated: " + context.User.Identity?.IsAuthenticated);
 
-            if (claim == null)
-                return Task.CompletedTask;
+            foreach (var claim in context.User.Claims)
+            {
+                Console.WriteLine($"CLAIM => {claim.Type} = {claim.Value}");
+            }
 
-            if (!Enum.TryParse<TipoUsuarioEnum>(claim.Value, out var tipoUsuario))
+            var claimTipo = context.User.FindFirst("tipo_usuario");
+
+            if (claimTipo == null)
+            {
+                Console.WriteLine("❌ CLAIM tipo_usuario NÃO EXISTE");
                 return Task.CompletedTask;
+            }
+
+            Console.WriteLine("tipo_usuario recebido: " + claimTipo.Value);
+
+            if (!Enum.TryParse<TipoUsuarioEnum>(claimTipo.Value, out var tipoUsuario))
+            {
+                Console.WriteLine("❌ NÃO conseguiu converter para enum");
+                return Task.CompletedTask;
+            }
+
+            Console.WriteLine("Enum convertido: " + tipoUsuario);
 
             if (requirement.TiposPermitidos.Contains(tipoUsuario))
+            {
+                Console.WriteLine("✅ POLICY SATISFEITA");
                 context.Succeed(requirement);
+            }
+            else
+            {
+                Console.WriteLine("❌ POLICY NÃO SATISFEITA");
+            }
 
             return Task.CompletedTask;
         }

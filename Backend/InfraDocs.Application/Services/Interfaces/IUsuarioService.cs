@@ -1,4 +1,5 @@
-﻿using InfraDocs.Shared.Dtos.Usuario;
+﻿using InfraDocs.Shared.Dtos.Common;
+using InfraDocs.Shared.Dtos.Usuario;
 
 namespace InfraDocs.Application.Services.Interfaces
 {
@@ -9,5 +10,7 @@ namespace InfraDocs.Application.Services.Interfaces
             UpdateUsuarioDto>
     {
         Task<ReadUsuarioDto> GetByEmailAsync(string email);
+        Task<PagedResultDto<ReadUsuarioDto>> GetPagedAsync(
+                int pageNumber, int pageSize, string? filterColumn, string? filterText);
     }
 }

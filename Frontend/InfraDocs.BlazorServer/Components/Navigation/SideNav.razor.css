@@ -1,0 +1,5 @@
+﻿.sidenav-root {
+    height: 100vh;
+    background-color: var(--mud-palette-background);
+    border-right: 1px solid var(--mud-palette-divider);
+}

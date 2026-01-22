@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace InfraDocs.BlazorServer.Configurations
+﻿namespace InfraDocs.BlazorServer.Configurations
 {
     public static class HttpClientDependencyInjection
     {
@@ -8,18 +6,21 @@ namespace InfraDocs.BlazorServer.Configurations
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddScoped(sp =>
+            // 🔓 LOGIN / REFRESH (SEM TOKEN)
+            services.AddHttpClient("Api", client =>
             {
-                var apiBaseUrl = configuration["ApiSettings:BaseUrl"];
+                client.BaseAddress =
+                    new Uri(configuration["ApiSettings:BaseUrl"]!);
+            });
 
-                return new HttpClient
-                {
-                    BaseAddress = new Uri(apiBaseUrl!)
-                };
+            // 🔐 API AUTENTICADA (COM TOKEN)
+            services.AddHttpClient("ApiAuth", client =>
+            {
+                client.BaseAddress =
+                    new Uri(configuration["ApiSettings:BaseUrl"]!);
             });
 
             return services;
         }
     }
 }
-

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.0" />
-    <PackageReference Include="MudBlazor" Version="8" />
+    <PackageReference Include="MudBlazor" Version="8.0.0" />
     <PackageReference Include="Solutaris.InfoWARE.ProtectedBrowserStorage" Version="1.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
   </ItemGroup>
